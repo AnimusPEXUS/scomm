@@ -1,55 +1,48 @@
 package main
 
 import (
-	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
 
-type UIWindowLogin struct {
-	root *gtk.Window
+type UIWindowStorageLoad struct {
+	window *gtk.Window
 
-	button_open           *gtk.Button
-	button_browse_storage *gtk.Button
+	button_load  *gtk.Button
+	button_close *gtk.Button
 
-	entry_name     *gtk.Entry
-	entry_password *gtk.Entry
+	entry_name *gtk.Entry
+	entry_key  *gtk.Entry
 }
 
-func UIWindowLoginNew(preset_entry_name string) *UIWindowLogin {
+func UIWindowStorageLoadNew(preset_entry_name string) (*UIWindowStorageLoad, error) {
 
-	ret := new(UIWindowLogin)
-
-	self := new(UIMainWindow)
+	ret := new(UIWindowStorageLoad)
 
 	builder, err := gtk.BuilderNew()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
-	data := ui.MustAsset("ui/plugin_control.glade")
-
-
-	err = builder.AddFromString(string(data))
+	data, err := uiStorageLoadGlade()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
+	}
+
+	err = builder.AddFromString(string(data.bytes))
+	if err != nil {
+		return nil, err
 	}
 
 	{
-		t0, _ := builder.GetObject("root")
+		t0, _ := builder.GetObject("window")
 		t1, _ := t0.(*gtk.Window)
-		ret.root = t1
+		ret.window = t1
 	}
 
 	{
-		t0, _ := builder.GetObject("button_open")
+		t0, _ := builder.GetObject("button_load")
 		t1, _ := t0.(*gtk.Button)
-		ret.button_open = t1
-	}
-
-	{
-		t0, _ := builder.GetObject("button_browse_storage")
-		t1, _ := t0.(*gtk.Button)
-		ret.button_browse_storage = t1
+		ret.button_load = t1
 	}
 
 	{
@@ -59,56 +52,52 @@ func UIWindowLoginNew(preset_entry_name string) *UIWindowLogin {
 	}
 
 	{
-		t0, _ := builder.GetObject("entry_password")
+		t0, _ := builder.GetObject("entry_key")
 		t1, _ := t0.(*gtk.Entry)
-		ret.entry_password = t1
+		ret.entry_key = t1
 	}
 
 	ret.entry_name.SetText(preset_entry_name)
 
-	ret.button_open.Connect(
+	ret.button_load.Connect(
 		"clicked",
 		func(
 			button *gtk.Button,
-			win *UIWindowLogin,
+			win *UIWindowStorageLoad,
 		) {
 			name, err := win.entry_name.GetText()
 			if err != nil {
 				panic(err.Error)
 			}
-			password, err := win.entry_password.GetText()
+			key, err := win.entry_key.GetText()
 			if err != nil {
 				panic(err.Error)
 			}
 			controller, err := NewController(
 				name,
-				password,
+				key,
 			)
 			if err != nil {
-				glib.IdleAdd(
-					func() {
-						d := gtk.MessageDialogNew(
-							ret.root,
-							0,
-							gtk.MESSAGE_ERROR,
-							gtk.BUTTONS_OK,
-							"Error creating controller: "+err.Error(),
-						)
-						d.Run()
-						d.Destroy()
-					},
+				d := gtk.MessageDialogNew(
+					ret.window,
+					0,
+					gtk.MESSAGE_ERROR,
+					gtk.BUTTONS_OK,
+					"Error creating controller: "+err.Error(),
 				)
+				d.Run()
+				d.Destroy()
 				return
 			}
 			controller.ShowMainWindow()
-			win.root.Destroy()
+			win.window.Destroy()
 		},
 		ret,
 	)
 
-	return ret
+	return ret, nil
 }
 
-func (self *UIWindowLogin) Show() {
-	self.root.ShowAll()
+func (self *UIWindowStorageLoad) Show() {
+	self.window.ShowAll()
 }
