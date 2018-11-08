@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Accepting builtin or external module</property>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkGrid">
         <property name="visible">True</property>
@@ -20,7 +23,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">Module Acceptance Info</property>
+            <property name="label" translatable="yes">Plugin Acceptance Info</property>
             <property name="wrap">True</property>
             <attributes>
               <attribute name="weight" value="bold"/>
@@ -61,7 +64,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="label" translatable="yes">Name¹</property>
+            <property name="label" translatable="yes">Name*</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -85,7 +88,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="label" translatable="yes">Checksum²</property>
+            <property name="label" translatable="yes">Checksum**</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -97,7 +100,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="label" translatable="yes">Title¹</property>
+            <property name="label" translatable="yes">Title*</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -109,7 +112,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="label" translatable="yes">Description¹</property>
+            <property name="label" translatable="yes">Description*</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -147,7 +150,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">end</property>
-            <property name="label" translatable="yes">File Path²</property>
+            <property name="label" translatable="yes">File Path**</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -207,7 +210,7 @@
         </child>
         <child>
           <object class="GtkButton" id="button_open_external">
-            <property name="label" translatable="yes">Open External Module</property>
+            <property name="label" translatable="yes">Open External Plugin</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -215,7 +218,7 @@
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">8</property>
+            <property name="top_attach">9</property>
             <property name="width">2</property>
           </packing>
         </child>
@@ -224,8 +227,8 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
-            <property name="label" translatable="yes">¹ - If module is external (not builtin), then this line is known only after module opening
-² - This line is meaningless for builtin modules</property>
+            <property name="label" translatable="yes">* - If plugin is external (not builtin), then this line is known only after plugin file opening
+** - This line is meaningless for builtin plugins</property>
             <property name="wrap">True</property>
             <attributes>
               <attribute name="scale" value="0.80000000000000004"/>
@@ -245,7 +248,7 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button_accept_module">
-                <property name="label" translatable="yes">Accept Module</property>
+                <property name="label" translatable="yes">Accept Plugin</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -272,7 +275,7 @@
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">9</property>
+            <property name="top_attach">10</property>
             <property name="width">2</property>
           </packing>
         </child>
@@ -286,15 +289,15 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">You are going to accept new module
+                <property name="label" translatable="yes">You are going to accept new plugin
 
-Built-in modules do not require additional precautions and can be accepted as is.
+Builtin plugins do not require additional precautions and can be accepted as is.
 
-External (plugin) modules, however, should be double ensured, before tryin to even open them, as opening Golang plugin presumes it's init() function execution.
+External plugins, however, should be double checked, before tryin to even open (load) them, as opening Golang plugin presumes it's init() function execution.
 
-So, before hitting open button, be ensured that this is indeed module You have got from it's respective creator and You trust it's code.
+So, before clicking 'open' button, be ensured that this is indeed plugin You have got from it's respective creator and You trust it's code.
 
-If You will accept module, Your DNet program will then automatically check external module's checksum each time before opening it, to ensure it is really the same file which You accepted.</property>
+If You will accept plugin, Your SComm program will then automatically check external plugins's checksum each time before opening it, to ensure it is really the same file which You've accepted.</property>
                 <property name="wrap">True</property>
                 <attributes>
                   <attribute name="scale" value="0.80000000000000004"/>
@@ -311,7 +314,7 @@ If You will accept module, Your DNet program will then automatically check exter
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Security Warning (please, read it, before opening external module)</property>
+                    <property name="label" translatable="yes">Security Notice (please, read it, before opening external plugin)</property>
                     <property name="wrap">True</property>
                     <attributes>
                       <attribute name="scale" value="0.80000000000000004"/>
@@ -327,7 +330,7 @@ If You will accept module, Your DNet program will then automatically check exter
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">10</property>
+            <property name="top_attach">8</property>
             <property name="width">2</property>
           </packing>
         </child>

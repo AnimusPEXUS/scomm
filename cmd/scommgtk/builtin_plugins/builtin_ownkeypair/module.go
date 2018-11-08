@@ -1,50 +1,84 @@
 package builtin_ownkeypair
 
-import "github.com/AnimusPEXUS/dnet"
+import (
+	"github.com/AnimusPEXUS/appplugsys"
+	"github.com/jinzhu/gorm"
+)
 
-type Module struct {
-	name *dnet.ModuleName
+func GetPlugin() *appplugsys.Plugin {
+
+	ret := &appplugsys.Plugin{
+		Name:        "builtin_ownkeypair",
+		Description: "manipulate own keypair",
+		Requires:    []string{},
+		Init: func(
+			iface *appplugsys.AppPlugSysIface,
+			db *gorm.DB,
+		) error {
+			if controller == nil {
+				c, err := NewController(iface, db)
+				if err != nil {
+					return err
+				}
+				controller = c
+			}
+
+			return nil
+		},
+		Destroy: func() error {
+			if controller != nil {
+				controller.Destroy()
+			}
+			return nil
+		},
+
+		GetController: func() interface{} {
+			return controller
+		},
+		Applications: map[string]*appplugsys.PluginApplication{},
+	}
+	ret.Applications["ownkeypair"] = &appplugsys.PluginApplication{
+		Name: "ownkeypair",
+		Display: func() error {
+			controller.Display()
+			return nil
+		},
+	}
+	return ret
 }
 
-func (self *Module) Name() *dnet.ModuleName {
-	if self.name == nil {
-		t, err := dnet.ModuleNameNew("builtin_ownkeypair")
-		if err != nil {
-			panic("this shold not been happen")
-		}
-		self.name = t
+type Controller struct {
+	iface *appplugsys.AppPlugSysIface
+	db    *gorm.DB
+
+	window *UIWindow
+}
+
+func NewController(
+	iface *appplugsys.AppPlugSysIface,
+	db *gorm.DB,
+) (*Controller, error) {
+
+	self := new(Controller)
+	self.iface = iface
+	self.db = db
+
+	if t, err := UIWindowNew(self); err != nil {
+		return nil, err
+	} else {
+		self.window = t
 	}
 
-	return self.name
+	return self, nil
 }
 
-func (self *Module) Title() string {
-	return "Your Own Key Pair Editor"
+func (self *Controller) Destroy() error {
+	return nil
 }
 
-func (self *Module) Description() string {
-	return "Use this to create or load existing key pair to use as Your identity"
+func (self *Controller) Display() error {
+	self.window.Show()
+	return nil
 }
 
-func (self *Module) DependsOn() []string {
-	return []string{}
-}
-
-func (self *Module) IsWorker() bool {
-	return false
-}
-
-func (self *Module) IsNetwork() bool {
-	return false
-}
-
-func (self *Module) HaveUI() bool {
-	return true
-}
-
-func (self *Module) Instantiate(com dnet.ApplicationCommunicatorI) (
-	dnet.ApplicationModuleInstanceI,
-	error,
-) {
-	return NewInstance(self, com)
-}
+var controller *Controller

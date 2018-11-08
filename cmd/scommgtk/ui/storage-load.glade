@@ -5,10 +5,8 @@
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Load Storage</property>
-    <property name="resizable">False</property>
     <property name="window_position">center</property>
-    <property name="default_width">800</property>
-    <property name="default_height">200</property>
+    <property name="type_hint">dialog</property>
     <property name="gravity">center</property>
     <child>
       <placeholder/>
@@ -89,7 +87,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="entry_password">
+              <object class="GtkEntry" id="entry_key">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="hexpand">True</property>

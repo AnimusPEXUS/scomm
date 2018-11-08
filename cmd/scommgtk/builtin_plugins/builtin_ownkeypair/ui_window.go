@@ -15,7 +15,7 @@ import (
 )
 
 type UIWindow struct {
-	inst *Instance
+	controller *Controller
 
 	window                       *gtk.Window
 	button_generate_own_key_pair *gtk.Button
@@ -25,11 +25,9 @@ type UIWindow struct {
 	key_editor_own               *key_cert_editor.UIKeyCertEditor
 }
 
-func UIWindowNew(inst *Instance) (*UIWindow, error) {
+func UIWindowNew(controller *Controller) (*UIWindow, error) {
 
 	ret := new(UIWindow)
-
-	ret.inst = inst
 
 	builder, err := gtk.BuilderNew()
 	if err != nil {
@@ -123,82 +121,82 @@ func UIWindowNew(inst *Instance) (*UIWindow, error) {
 		},
 	)
 
-	ret.button_save_own_key_pair.Connect(
-		"clicked",
-		func() {
-			txt, err := ret.key_editor_own.GetText()
-			if err != nil {
-				glib.IdleAdd(
-					func() {
-						d := gtk.MessageDialogNew(
-							ret.window,
-							0,
-							gtk.MESSAGE_ERROR,
-							gtk.BUTTONS_OK,
-							"Error getting text from key editor ui: "+err.Error(),
-						)
-						d.Run()
-						d.Destroy()
-					},
-				)
-				return
-			}
-			err = ret.inst.db.SetOwnPrivKey(txt)
-			if err != nil {
-				glib.IdleAdd(
-					func() {
-						d := gtk.MessageDialogNew(
-							ret.window,
-							0,
-							gtk.MESSAGE_ERROR,
-							gtk.BUTTONS_OK,
-							"Key saving error: "+err.Error(),
-						)
-						d.Run()
-						d.Destroy()
-					},
-				)
-			} else {
-				glib.IdleAdd(
-					func() {
-						d := gtk.MessageDialogNew(
-							ret.window,
-							0,
-							gtk.MESSAGE_INFO,
-							gtk.BUTTONS_OK,
-							"Saved ",
-						)
-						d.Run()
-						d.Destroy()
-					},
-				)
-			}
-		},
-	)
+	//	ret.button_save_own_key_pair.Connect(
+	//		"clicked",
+	//		func() {
+	//			txt, err := ret.key_editor_own.GetText()
+	//			if err != nil {
+	//				glib.IdleAdd(
+	//					func() {
+	//						d := gtk.MessageDialogNew(
+	//							ret.window,
+	//							0,
+	//							gtk.MESSAGE_ERROR,
+	//							gtk.BUTTONS_OK,
+	//							"Error getting text from key editor ui: "+err.Error(),
+	//						)
+	//						d.Run()
+	//						d.Destroy()
+	//					},
+	//				)
+	//				return
+	//			}
+	//			err = ret.controller.SetOwnPrivKey(txt)
+	//			if err != nil {
+	//				glib.IdleAdd(
+	//					func() {
+	//						d := gtk.MessageDialogNew(
+	//							ret.window,
+	//							0,
+	//							gtk.MESSAGE_ERROR,
+	//							gtk.BUTTONS_OK,
+	//							"Key saving error: "+err.Error(),
+	//						)
+	//						d.Run()
+	//						d.Destroy()
+	//					},
+	//				)
+	//			} else {
+	//				glib.IdleAdd(
+	//					func() {
+	//						d := gtk.MessageDialogNew(
+	//							ret.window,
+	//							0,
+	//							gtk.MESSAGE_INFO,
+	//							gtk.BUTTONS_OK,
+	//							"Saved ",
+	//						)
+	//						d.Run()
+	//						d.Destroy()
+	//					},
+	//				)
+	//			}
+	//		},
+	//	)
 
-	ret.button_load_own_key_pair.Connect(
-		"clicked",
-		func() {
-			txt, err := ret.inst.db.GetOwnPrivKey()
-			if err != nil {
-				glib.IdleAdd(
-					func() {
-						d := gtk.MessageDialogNew(
-							ret.window,
-							0,
-							gtk.MESSAGE_ERROR,
-							gtk.BUTTONS_OK,
-							"Error getting key from storage: "+err.Error(),
-						)
-						d.Run()
-						d.Destroy()
-					},
-				)
-				return
-			}
-			ret.key_editor_own.SetText(txt)
-		},
-	)
+	//	ret.button_load_own_key_pair.Connect(
+	//		"clicked",
+	//		func() {
+	//			txt, err := ret.controller.GetOwnPrivKey()
+	//			if err != nil {
+	//				glib.IdleAdd(
+	//					func() {
+	//						d := gtk.MessageDialogNew(
+	//							ret.window,
+	//							0,
+	//							gtk.MESSAGE_ERROR,
+	//							gtk.BUTTONS_OK,
+	//							"Error getting key from storage: "+err.Error(),
+	//						)
+	//						d.Run()
+	//						d.Destroy()
+	//					},
+	//				)
+	//				return
+	//			}
+	//			ret.key_editor_own.SetText(txt)
+	//		},
+	//	)
 
 	return ret, nil
 }
