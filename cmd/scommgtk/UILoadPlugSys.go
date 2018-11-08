@@ -23,12 +23,12 @@ func UIWindowStorageLoadNew(preset_entry_name string) (*UIWindowStorageLoad, err
 		return nil, err
 	}
 
-	data, err := uiStorageLoadGlade()
+	data, err := uiStorageLoadGladeBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	err = builder.AddFromString(string(data.bytes))
+	err = builder.AddFromString(string(data))
 	if err != nil {
 		return nil, err
 	}

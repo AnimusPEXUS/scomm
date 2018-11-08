@@ -91,13 +91,13 @@ func UIMainWindowTabApplicationsNew(
 	}
 
 	{
-		t0, _ := builder.GetObject("button_ava_refresh")
+		t0, _ := builder.GetObject("button_ava_plug_refresh")
 		t1, _ := t0.(*gtk.Button)
 		ret.button_ava_plug_refresh = t1
 	}
 
 	{
-		t0, _ := builder.GetObject("button_ava_accept")
+		t0, _ := builder.GetObject("button_ava_plug_accept")
 		t1, _ := t0.(*gtk.Button)
 		ret.button_ava_plug_accept = t1
 	}
@@ -315,7 +315,7 @@ func UIMainWindowTabApplicationsNew(
 							true,
 							"N/A",
 							"N/A",
-							"N/A",
+							i.Plugin.Description,
 						},
 					)
 				}
@@ -328,9 +328,9 @@ func UIMainWindowTabApplicationsNew(
 		func() {
 
 			var (
-				builtin  bool
-				name     string
-				checksum string
+				builtin bool
+				name    string
+				sha512  string
 			)
 
 			sel, _ := ret.tw_ava.GetSelection()
@@ -353,12 +353,24 @@ func UIMainWindowTabApplicationsNew(
 
 			{
 				val, _ := model.(*gtk.TreeModel).GetValue(iter, 2)
-				checksum, _ = val.GetString()
+				sha512, _ = val.GetString()
 			}
 
-			fmt.Println("builtin", builtin)
-			fmt.Println("name", name)
-			fmt.Println("checksum", checksum)
+			//			fmt.Println("builtin", builtin)
+			//			fmt.Println("name", name)
+			//			fmt.Println("sha512", sha512)
+
+			acc_window, err := UIPluginAcceptorWindowNew(
+				ret.main_window,
+				builtin,
+				name,
+				sha512,
+			)
+			if err != nil {
+				fmt.Println("error", err.Error())
+			}
+
+			acc_window.Show()
 
 		},
 	)
