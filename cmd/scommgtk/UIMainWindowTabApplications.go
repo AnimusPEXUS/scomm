@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/AnimusPEXUS/appplugsys"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
@@ -94,13 +93,13 @@ func UIMainWindowTabApplicationsNew(
 	{
 		t0, _ := builder.GetObject("button_ava_refresh")
 		t1, _ := t0.(*gtk.Button)
-		ret.button_ava_refresh = t1
+		ret.button_ava_plug_refresh = t1
 	}
 
 	{
 		t0, _ := builder.GetObject("button_ava_accept")
 		t1, _ := t0.(*gtk.Button)
-		ret.button_ava_accept = t1
+		ret.button_ava_plug_accept = t1
 	}
 
 	{
@@ -270,7 +269,7 @@ func UIMainWindowTabApplicationsNew(
 	//			},
 	//		)
 
-	ret.button_ava_refresh.Connect(
+	ret.button_ava_plug_refresh.Connect(
 		"clicked",
 		func() {
 
@@ -324,7 +323,7 @@ func UIMainWindowTabApplicationsNew(
 		},
 	)
 
-	ret.button_ava_accept.Connect(
+	ret.button_ava_plug_accept.Connect(
 		"clicked",
 		func() {
 
@@ -360,10 +359,6 @@ func UIMainWindowTabApplicationsNew(
 			fmt.Println("builtin", builtin)
 			fmt.Println("name", name)
 			fmt.Println("checksum", checksum)
-
-			appplugsys.PluginWrap
-
-			ret.main_window.controller.appplugsys.AcceptInternalPlugin()
 
 		},
 	)

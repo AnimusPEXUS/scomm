@@ -19,8 +19,6 @@ type Controller struct {
 	main_window *UIMainWindow
 
 	plugin_searcher appplugsys.PluginSearcherI
-	plugin_opener   appplugsys.PluginOpenerI
-	plugin_acceptor appplugsys.PluginAcceptorI
 	appplugsys      *appplugsys.AppPlugSys
 }
 
@@ -46,7 +44,7 @@ func NewController(
 
 	if t, err := NewPluginSearcher(
 		[]*appplugsys.Plugin{
-			builtin_ownkeypair.Plugin,
+			builtin_ownkeypair.GetPlugin(),
 		},
 		[]string{path.Join(SCOMM_CONFIG_DIR, "plugins")},
 	); err != nil {
@@ -58,9 +56,6 @@ func NewController(
 	if t, err := appplugsys.NewAppPlugSys(
 		self.db,
 		self.plugin_searcher,
-		self.plugin_opener,
-		self.plugin_acceptor,
-		nil,
 	); err != nil {
 		return nil, err
 	} else {
