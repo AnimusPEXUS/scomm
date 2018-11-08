@@ -57,35 +57,33 @@ func NewController(
 	if t, err := appplugsys.NewAppPlugSys(
 		self.db,
 		func(info *appplugsys.DBPluginInfo) (*gorm.DB, bool, bool, error) {
-			db := OpenApplicationStorage(
+			db, err := OpenApplicationStorage(
 				storage_name,
 				info.Name,
 			)
+			if err != nil {
+				return nil, false, false, err
+			}
 
 			if info.Key != "" {
 				p := "PRAGMA key = '" + info.Key + "';"
 				err = db.Exec(p).Error
 				if err != nil {
-					return nil, err
+					return nil, false, false, err
 				}
 			}
 
 			need_key := false
 			need_rekey := false
 
-			need_key := info.Key == ""
+			need_key = info.Key == ""
 
 			if !need_key {
+				tt := time.Now().UTC()
+				dur := tt.Sub(info.LastDBReKey)
 
-				need_rekey = info.LastDBReKey == nil
-
-				if !need_rekey {
-					tt := time.Now().UTC()
-					dur := tt.Sub(info.LastDBReKey)
-
-					if dur.Hours() > time.Duration(30*(24*time.Hour)) {
-						need_rekey = true
-					}
+				if dur.Hours() > time.Duration(30*(24*time.Hour)).Hours() {
+					need_rekey = true
 				}
 			}
 
