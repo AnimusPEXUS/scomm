@@ -2,6 +2,7 @@ package main
 
 import (
 	"path"
+	"time"
 
 	"github.com/AnimusPEXUS/appplugsys"
 	"github.com/AnimusPEXUS/scomm/cmd/scommgtk/builtin_plugins/builtin_ownkeypair"
@@ -34,7 +35,7 @@ func NewController(
 		return nil, err
 	}
 
-	p := "PRAGMA key = '" + storage_key + "';"
+	p := "PRAGMA key = '" + storage_key + "';" // TODO: escape storage_key
 	err = db.Exec(p).Error
 	if err != nil {
 		return nil, err
@@ -55,6 +56,43 @@ func NewController(
 
 	if t, err := appplugsys.NewAppPlugSys(
 		self.db,
+		func(info *appplugsys.DBPluginInfo) (*gorm.DB, bool, bool, error) {
+			db := OpenApplicationStorage(
+				storage_name,
+				info.Name,
+			)
+
+			if info.Key != "" {
+				p := "PRAGMA key = '" + info.Key + "';"
+				err = db.Exec(p).Error
+				if err != nil {
+					return nil, err
+				}
+			}
+
+			need_key := false
+			need_rekey := false
+
+			need_key := info.Key == ""
+
+			if !need_key {
+
+				need_rekey = info.LastDBReKey == nil
+
+				if !need_rekey {
+					tt := time.Now().UTC()
+					dur := tt.Sub(info.LastDBReKey)
+
+					if dur.Hours() > time.Duration(30*(24*time.Hour)) {
+						need_rekey = true
+					}
+				}
+			}
+
+			return db, need_key, need_rekey, nil
+
+			//			if info.Key == "" || -
+		},
 		self.plugin_searcher,
 	); err != nil {
 		return nil, err
