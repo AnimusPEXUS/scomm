@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/AnimusPEXUS/appplugsys"
 	"github.com/AnimusPEXUS/utils/worker"
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
 )
@@ -11,9 +14,10 @@ import (
 type UIMainWindowTabApplications struct {
 	main_window *UIMainWindow
 
-	iv_app_icons *gtk.IconView
+	iv_app_icons       *gtk.IconView
+	iv_app_icons_model *gtk.ListStore
 
-	status_refresher *worker.Worker
+	applications_tab_status_refresher *worker.Worker
 }
 
 func UIMainWindowTabApplicationsNew(
@@ -23,35 +27,36 @@ func UIMainWindowTabApplicationsNew(
 
 	ret := new(UIMainWindowTabApplications)
 
-	ret.status_refresher = worker.New(ret.statusRefresherTask)
+	ret.applications_tab_status_refresher = worker.New(ret.statusRefresherTask)
 
 	ret.main_window = main_window
 
-	main_window.window.Connect("destroy", func() { ret.status_refresher.Stop() })
+	main_window.window.Connect("destroy", func() { ret.applications_tab_status_refresher.Stop() })
 
-	ret.status_refresher.Start()
+	ret.applications_tab_status_refresher.Start()
 
-	//	{
-	//		ret.ls_acc, _ = gtk.ListStoreNew(
-	//			glib.TYPE_STRING,  // Name
-	//			glib.TYPE_BOOLEAN, // builtin?
-	//			glib.TYPE_BOOLEAN, // enabled?
-	//			glib.TYPE_STRING,  // Status
-	//			glib.TYPE_STRING,  // Checksum
-	//			glib.TYPE_STRING,  // Last ReKey time
-	//		)
+	{
+		t0, _ := builder.GetObject("iv_app_icons")
+		t1, _ := t0.(*gtk.IconView)
+		ret.iv_app_icons = t1
+	}
 
-	//		ret.ls_ava, _ = gtk.ListStoreNew(
-	//			glib.TYPE_STRING,  // Name
-	//			glib.TYPE_BOOLEAN, // builtin?
-	//			glib.TYPE_STRING,  // Checksum
-	//			glib.TYPE_STRING,  // Path
-	//			glib.TYPE_STRING,  // Descr
-	//		)
+	if t, err := gtk.ListStoreNew(
+		glib.TYPE_STRING,    // Title
+		gdk.PixbufGetType(), // Icon
+		glib.TYPE_STRING,    // Pluin Name
+		glib.TYPE_STRING,    // Name
+		glib.TYPE_STRING,    // Description
 
-	//		ret.tw_acc.SetModel(ret.ls_acc)
-	//		ret.tw_ava.SetModel(ret.ls_ava)
-	//	}
+	); err != nil {
+		return nil, err
+	} else {
+		ret.iv_app_icons_model = t
+	}
+
+	ret.iv_app_icons.SetTextColumn(0)
+	ret.iv_app_icons.SetPixbufColumn(1)
+	ret.iv_app_icons.SetModel(ret.iv_app_icons_model)
 
 	return ret, nil
 }
@@ -79,6 +84,115 @@ func (self *UIMainWindowTabApplications) statusRefresherTask(
 			func() {
 
 				defer func() { c <- true }()
+
+				mdl := self.iv_app_icons_model
+
+				table := self.main_window.controller.appplugsys.ApplicationInfoTable()
+
+				table_have_this := func(plugin_name, name string) bool {
+					for _, i := range table {
+						if i.PluginName == plugin_name && i.Name == name {
+							return true
+						}
+					}
+					return false
+				}
+
+				table_get_item := func(plugin_name, name string) *appplugsys.AppPlugSysApplicationDisplayItem {
+					for _, i := range table {
+						if i.PluginName == plugin_name && i.Name == name {
+							return i
+						}
+					}
+					return nil
+				}
+
+				found := make([][2]string, 0)
+
+				{
+					iter, ok := mdl.GetIterFirst()
+					for ok {
+
+						val, err := mdl.GetValue(iter, 2)
+						if err != nil {
+							panic(err)
+						}
+
+						plugin_name, err := val.GetString()
+						if err != nil {
+							panic(err)
+						}
+
+						val, err = mdl.GetValue(iter, 3)
+						if err != nil {
+							panic(err)
+						}
+
+						name, err := val.GetString()
+						if err != nil {
+							panic(err)
+						}
+
+						found = append(found, [2]string{plugin_name, name})
+
+						if !table_have_this(plugin_name, name) {
+							ok = mdl.Remove(iter)
+						} else {
+							it := table_get_item(plugin_name, name)
+							if it == nil {
+								panic("programming error")
+							}
+							mdl.Set(
+								iter,
+								[]int{0, 1, 2, 3, 4, 5},
+								[]interface{}{
+									it.Title,
+									nil,
+									it.PluginName,
+									it.Name,
+									it.Description,
+								},
+							)
+							ok = mdl.IterNext(iter)
+						}
+
+					}
+				}
+
+				not_found := make([][2]string, 0)
+
+			search:
+				for _, v := range table {
+					for _, i := range found {
+						if v.PluginName == i[0] && v.Name == i[1] {
+							continue search
+						}
+					}
+					not_found = append(not_found, [2]string{v.PluginName, v.Name})
+				}
+
+				for _, i := range not_found {
+					it := table_get_item(i[0], i[1])
+					if it == nil {
+						panic("programming error")
+					}
+					iter := mdl.Append()
+					fmt.Printf("appending new %#v\n", it)
+					err := mdl.Set(
+						iter,
+						[]int{0, 1, 2, 3, 4},
+						[]interface{}{
+							it.Title,
+							nil,
+							it.PluginName,
+							it.Name,
+							it.Description,
+						},
+					)
+					if err != nil {
+						panic(err)
+					}
+				}
 
 			},
 		)

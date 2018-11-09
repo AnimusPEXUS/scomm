@@ -7,8 +7,8 @@ import (
 type UIMainWindow struct {
 	controller *Controller
 
-	*UIMainWindowTabApplications
-	*UIMainWindowTabPlugins
+	tab_applications *UIMainWindowTabApplications
+	tab_plugins      *UIMainWindowTabPlugins
 
 	window *gtk.Window
 
@@ -61,26 +61,22 @@ func UIMainWindowNew(controller *Controller) (*UIMainWindow, error) {
 		ret.window = t1
 	}
 
-	{
-		if res, err := UIMainWindowTabApplicationsNew(
-			builder,
-			ret,
-		); err == nil {
-			ret.UIMainWindowTabApplications = res
-		} else {
-			panic(err.Error())
-		}
+	if res, err := UIMainWindowTabApplicationsNew(
+		builder,
+		ret,
+	); err != nil {
+		return nil, err
+	} else {
+		ret.tab_applications = res
 	}
 
-	{
-		if res, err := UIMainWindowTabPluginsNew(
-			builder,
-			ret,
-		); err == nil {
-			ret.UIMainWindowTabPlugins = res
-		} else {
-			panic(err.Error())
-		}
+	if res, err := UIMainWindowTabPluginsNew(
+		builder,
+		ret,
+	); err != nil {
+		return nil, err
+	} else {
+		ret.tab_plugins = res
 	}
 
 	//	{

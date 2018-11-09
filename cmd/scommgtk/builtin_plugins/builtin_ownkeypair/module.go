@@ -38,7 +38,8 @@ func GetPlugin() *appplugsys.Plugin {
 		Applications: map[string]*appplugsys.PluginApplication{},
 	}
 	ret.Applications["ownkeypair"] = &appplugsys.PluginApplication{
-		Name: "ownkeypair",
+		Name:  "ownkeypair",
+		Title: "Your Own Key Pair Manager",
 		Display: func() error {
 			controller.Display()
 			return nil

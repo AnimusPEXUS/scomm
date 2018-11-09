@@ -29,7 +29,7 @@ type UIMainWindowTabPlugins struct {
 	ls_acc *gtk.ListStore
 	ls_ava *gtk.ListStore
 
-	status_refresher *worker.Worker
+	plugins_tab_status_refresher *worker.Worker
 }
 
 func UIMainWindowTabPluginsNew(
@@ -39,13 +39,13 @@ func UIMainWindowTabPluginsNew(
 
 	ret := new(UIMainWindowTabPlugins)
 
-	ret.status_refresher = worker.New(ret.statusRefresherTask)
+	ret.plugins_tab_status_refresher = worker.New(ret.statusRefresherTask)
 
 	ret.main_window = main_window
 
-	main_window.window.Connect("destroy", func() { ret.status_refresher.Stop() })
+	main_window.window.Connect("destroy", func() { ret.plugins_tab_status_refresher.Stop() })
 
-	ret.status_refresher.Start()
+	ret.plugins_tab_status_refresher.Start()
 
 	//	{
 	//		t0, _ := builder.GetObject("button_acc_plug_refresh")
