@@ -2,14 +2,13 @@ package main
 
 import (
 	"github.com/gotk3/gotk3/gtk"
-	//"github.com/AnimusPEXUS/dnet"
-	//"github.com/AnimusPEXUS/dnet/common_types"
 )
 
 type UIMainWindow struct {
 	controller *Controller
 
 	*UIMainWindowTabApplications
+	*UIMainWindowTabPlugins
 
 	window *gtk.Window
 
@@ -33,7 +32,7 @@ type UIMainWindow struct {
 	//logger *gologger.Logger
 }
 
-func UIMainWindowNew(controller *Controller) *UIMainWindow {
+func UIMainWindowNew(controller *Controller) (*UIMainWindow, error) {
 
 	ret := new(UIMainWindow)
 
@@ -43,17 +42,23 @@ func UIMainWindowNew(controller *Controller) *UIMainWindow {
 
 	builder, err := gtk.BuilderNew()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	data, err := uiMainGladeBytes()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 
 	err = builder.AddFromString(string(data))
 	if err != nil {
-		panic(err.Error())
+		return nil, err
+	}
+
+	{
+		t0, _ := builder.GetObject("window")
+		t1, _ := t0.(*gtk.Window)
+		ret.window = t1
 	}
 
 	{
@@ -68,9 +73,14 @@ func UIMainWindowNew(controller *Controller) *UIMainWindow {
 	}
 
 	{
-		t0, _ := builder.GetObject("window")
-		t1, _ := t0.(*gtk.Window)
-		ret.window = t1
+		if res, err := UIMainWindowTabPluginsNew(
+			builder,
+			ret,
+		); err == nil {
+			ret.UIMainWindowTabPlugins = res
+		} else {
+			panic(err.Error())
+		}
 	}
 
 	//	{
@@ -100,7 +110,7 @@ func UIMainWindowNew(controller *Controller) *UIMainWindow {
 	//		},
 	//	)
 
-	return ret
+	return ret, nil
 }
 
 func (self *UIMainWindow) Show() {

@@ -32,9 +32,10 @@
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkIconView">
+                      <object class="GtkIconView" id="iv_app_icons">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="margin_right">270</property>
                         <property name="margin">6</property>
                       </object>
                     </child>
@@ -158,31 +159,6 @@
                         <property name="orientation">vertical</property>
                         <property name="spacing">5</property>
                         <property name="layout_style">start</property>
-                        <child>
-                          <object class="GtkButton" id="button_acc_plug_refresh">
-                            <property name="label" translatable="yes">Refresh</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkSeparator" id="separator2">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                            <property name="non_homogeneous">True</property>
-                          </packing>
-                        </child>
                         <child>
                           <object class="GtkButton" id="button_acc_plug_enable">
                             <property name="label" translatable="yes">Enable</property>
@@ -357,7 +333,7 @@
                         <property name="vexpand">True</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkTreeView" id="tw_acc">
+                          <object class="GtkTreeView" id="tv_acc">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="enable_grid_lines">both</property>
@@ -380,7 +356,7 @@
                         <property name="vexpand">True</property>
                         <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkTreeView" id="tw_ava">
+                          <object class="GtkTreeView" id="tv_ava">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="enable_grid_lines">both</property>
@@ -514,8 +490,6 @@
   </object>
   <object class="GtkSizeGroup">
     <widgets>
-      <widget name="button_acc_plug_refresh"/>
-      <widget name="separator2"/>
       <widget name="button_acc_plug_enable"/>
       <widget name="button_acc_plug_disable"/>
       <widget name="separator1"/>

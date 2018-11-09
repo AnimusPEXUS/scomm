@@ -9,7 +9,7 @@ import (
 func main() {
 	gtk.Init(nil)
 
-	win, err := UIWindowStorageLoadNew("agu")
+	win, err := UIWindowStorageLoadNew("")
 	if err != nil {
 		log.Fatal(err)
 	}

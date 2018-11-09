@@ -27,8 +27,14 @@ func NewController(
 	storage_name string,
 	storage_key string,
 ) (*Controller, error) {
+
 	self := new(Controller)
-	self.main_window = UIMainWindowNew(self)
+
+	if t, err := UIMainWindowNew(self); err != nil {
+		return nil, err
+	} else {
+		self.main_window = t
+	}
 
 	db, err := OpenMainStorage(storage_name)
 	if err != nil {
