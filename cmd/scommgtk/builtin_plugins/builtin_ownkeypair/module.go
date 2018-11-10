@@ -45,6 +45,11 @@ func GetPlugin() *appplugsys.Plugin {
 			return nil
 		},
 	}
+	icon_png_bytes, err := uiIconPngBytes()
+	if err != nil {
+		panic("programming error")
+	}
+	ret.Applications["ownkeypair"].Icon = icon_png_bytes
 	return ret
 }
 

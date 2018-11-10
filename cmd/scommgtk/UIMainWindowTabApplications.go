@@ -54,6 +54,65 @@ func UIMainWindowTabApplicationsNew(
 		ret.iv_app_icons_model = t
 	}
 
+	ret.iv_app_icons.Connect(
+		"item-activated",
+		func(
+			iv *gtk.IconView,
+			tp *gtk.TreePath,
+		) {
+			mdl := ret.iv_app_icons_model
+
+			iter, err := mdl.GetIter(tp)
+			if err != nil {
+				fmt.Println("error", err)
+				return
+			}
+
+			v, err := mdl.GetValue(iter, 2)
+			if err != nil {
+				fmt.Println("error", err)
+				return
+			}
+
+			plug_name, err := v.GetString()
+			if err != nil {
+				fmt.Println("error", err)
+				return
+			}
+
+			v, err = mdl.GetValue(iter, 3)
+			if err != nil {
+				fmt.Println("error", err)
+				return
+			}
+
+			name, err := v.GetString()
+			if err != nil {
+				fmt.Println("error", err)
+				return
+			}
+
+			err = ret.main_window.controller.appplugsys.DisplayApplication(
+				plug_name,
+				name,
+			)
+			if err != nil {
+
+				d := gtk.MessageDialogNew(
+					ret.main_window.window,
+					0,
+					gtk.MESSAGE_ERROR,
+					gtk.BUTTONS_OK,
+					"Application Display Error:\n"+err.Error(),
+				)
+				d.Run()
+				d.Close()
+			}
+			return
+
+		},
+	)
+
 	ret.iv_app_icons.SetTextColumn(0)
 	ret.iv_app_icons.SetPixbufColumn(1)
 	ret.iv_app_icons.SetModel(ret.iv_app_icons_model)
@@ -142,12 +201,22 @@ func (self *UIMainWindowTabApplications) statusRefresherTask(
 							if it == nil {
 								panic("programming error")
 							}
+
+							pbfl, err := gdk.PixbufLoaderNew()
+							if err != nil {
+								panic(err)
+							}
+							pbf, err := pbfl.WriteAndReturnPixbuf(it.Icon)
+							if err != nil {
+								panic(err)
+							}
+
 							mdl.Set(
 								iter,
 								[]int{0, 1, 2, 3, 4, 5},
 								[]interface{}{
 									it.Title,
-									nil,
+									pbf,
 									it.PluginName,
 									it.Name,
 									it.Description,
@@ -177,13 +246,22 @@ func (self *UIMainWindowTabApplications) statusRefresherTask(
 						panic("programming error")
 					}
 					iter := mdl.Append()
-					fmt.Printf("appending new %#v\n", it)
-					err := mdl.Set(
+
+					pbfl, err := gdk.PixbufLoaderNew()
+					if err != nil {
+						panic(err)
+					}
+					pbf, err := pbfl.WriteAndReturnPixbuf(it.Icon)
+					if err != nil {
+						panic(err)
+					}
+
+					err = mdl.Set(
 						iter,
 						[]int{0, 1, 2, 3, 4},
 						[]interface{}{
 							it.Title,
-							nil,
+							pbf,
 							it.PluginName,
 							it.Name,
 							it.Description,
