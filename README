@@ -1,0 +1,21 @@
+SComm
+
+Secure Communications
+
+Application for p2p communications secured with Priv/Pub Keypair.
+
+Implimentation:
+	Windowed application (currently only for GNU+Linux), written in Go
+		language and using Gtk+3 (gotk)
+
+Currently under development:
+	basic functionality
+
+Planned Functionality in future:
+	* Simple chat - will help Me to work things out
+	* Bug Tracker plugin - asked by one guy
+	* p2p git repository syncronization software (distributed Git repository
+		hosting analog)
+
+Accepting Donations Also via Bitcoin:
+	38VYVzpfYevXu1ZNFnygiD2i32eJt55KTs
